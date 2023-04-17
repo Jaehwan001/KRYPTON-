@@ -2,8 +2,8 @@ const { proto, getContentType, jidDecode, downloadContentFromMessage } = require
 const Bluebird = require('bluebird')
 
 const decodeJid = (jid) => {
-    const decode = jidDecode(jid) || {}
-    return ((decode.user && decode.server && decode.user + '@' + decode.server) || jid).trim()
+  const { user, server } = jidDecode(jid) || {}
+  return (user && server) ? `${user}@${server}`.trim() : jid
 }
 
 /**
@@ -60,12 +60,8 @@ function serialize(msg, client) {
         }
 
         msg.mentions = []
-        // msg.mentions = msg.message[msg.type]?.contextInfo ? msg.message[msg.type]?.contextInfo.mentionedJid : []
-        const array =
-            (msg?.message?.[msg.type]?.contextInfo?.mentionedJid
-                ? msg?.message[msg.type]?.contextInfo?.mentionedJid
-                : []) || []
-        array.filter((x) => x !== null && x !== undefined).forEach((user) => msg.mentions.push(user))
+        const array = msg?.message?.[msg.type]?.contextInfo?.mentionedJid || []
+        msg.mentions.push(...array.filter(Boolean))
         try {
             const quoted = msg.message[msg.type]?.contextInfo
             if (quoted.quotedMessage['ephemeralMessage']) {
@@ -100,7 +96,6 @@ function serialize(msg, client) {
                     message: quoted.quotedMessage
                 }
             }
-            msg.quoted.isSelf = msg.quoted.participant === decodeJid(client.user.id)
             msg.quoted.mtype = Object.keys(msg.quoted.message).filter(
                 (v) => v.includes('Message') || v.includes('conversation')
             )[0]
@@ -142,7 +137,6 @@ function serialize(msg, client) {
                     quoted: msg
                 }
             )
-        // msg.username = async (jid) => await getName(jid)
         msg.download = () => downloadMedia(msg.message)
     }
     return msg
