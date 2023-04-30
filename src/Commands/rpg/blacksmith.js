@@ -149,9 +149,8 @@ module.exports = {
                     }
                     items += `\n\n📗 *Type*: ${client.utils.capitalize(
                         abc
-                    )}\n⚖️ *Required*: ${material}\n💙 *Durability*: ${blacksmith[v][abc].durability}\n🪙 *Price*: ${
-                        blacksmith[v][abc].durability * 5
-                    }\n*Example*: ${client.prefix}${v} ${abc}\n\n`
+                    )}\n⚖️ *Required*: ${material}\n💙 *Durability*: ${blacksmith[v][abc].durability}\n🪙 *Price*: ${blacksmith[v][abc].durability * 5
+                        }\n*Example*: ${client.prefix}${v} ${abc}\n\n`
                 }
                 text += `${typeEmoji[objKeys.indexOf(v)]} *${client.utils.capitalize(v, true)}* ${items}`
             }
@@ -161,34 +160,26 @@ module.exports = {
             command == 'createsword'
                 ? 'sword'
                 : command == 'createarmor'
-                ? 'armor'
-                : command == 'createpickaxe'
-                ? 'pickaxe'
-                : 'fishingrod'
+                    ? 'armor'
+                    : command == 'createpickaxe'
+                        ? 'pickaxe'
+                        : 'fishingrod'
         if (await client.rpg.get(`${M.sender}[${type}]`))
             return M.reply(`👴🏽⛏️ : I see you still have ${type}, come when your ${type} is destroyed`)
+        M.reply(
+            `👴🏽⛏️ : Looks like I managed to make your ${arg.trim()} ${type} with durability ${blacksmith[command][arg.trim()].durability
+            }`
+        )
         const metalType = Object.keys(blacksmith[command])
         if (!metalType.includes(arg.trim())) return M.reply('Please give a valid type!')
-        const cradits = (await client.cradit.get(`${M.sender}.wallet`)) || 0
-        for (const less in blacksmith[command][arg.trim()].material) {
-            if (cradits - blacksmith[command][[arg.trim()]].durability * 5 < 0)
-                return M.reply('You dont have that much in your wallet')
-            let item = (await client.rpg.get(`${M.sender}[${less}]`)) || 0
-            if (item - blacksmith[command][[arg.trim()]].material[less] < 0) {
-                return M.reply(`You are short of ${less}\n`)
-            } else {
-                await client.rpg.set(`${M.sender}[${type}].type`, arg.trim())
-                await client.rpg.set(`${M.sender}[${type}].durability`, blacksmith[command][arg.trim()].durability)
-                await client.rpg.set(
-                    `${M.sender}[${less}]`,
-                    item - blacksmith[command][[arg.trim()]].material[less] * 1
-                )
-                return M.reply(
-                    `👴🏽⛏️ : Looks like I managed to make your ${arg.trim()} ${type} with durability ${
-                        blacksmith[command][arg.trim()].durability
-                    }`
-                )
-            }
+        const cradits = await client.cradit.get(`${M.sender}.wallet`) || 0
+        for (const [key, value] of Object.entries(blacksmith[command][arg.trim()].material)) {
+            const item = await client.rpg.get(`${M.sender}[${key}]`) || 0
+            if ((cradits - blacksmith[command][[arg.trim()]].durability * 5) < 0) return M.reply('You dont have that much in your wallet')
+            if ((item - value) < 0) return M.reply(`You are short of ${key}\n`)
+            await client.rpg.sub(`${M.sender}[${key}]`, value)
+            await client.rpg.set(`${M.sender}[${type}].type`, arg.trim())
+            await client.rpg.set(`${M.sender}[${type}].durability`, blacksmith[command][arg.trim()].durability)
         }
     }
 }
