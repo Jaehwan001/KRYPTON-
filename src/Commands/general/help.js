@@ -26,7 +26,7 @@ module.exports = {
                 M.pushName
             } (>❤️ω❤️)>*\n*I am ${client.utils.capitalize(
                 client.name
-            )}*\n*I am here to make*\n*your WhatsApp* 🎋\n*experience better ~\n\n*🎐COMMANDS🎐*\n\n${commands}\n🗃️ *Note:* Use ${
+            )}*\n*I am here to make*\n*your WhatsApp* 🎋\n*experience better ~\n\n*\n WAVE ⟩» https://chat.whatsapp.com/DCC2whPXuzE3UooYw3Gd4N/n🎐COMMANDS🎐*\n\n${commands}\n🗃️ *Note:* Use ${
                 client.prefix
             }help <cmd>\nto view the command info`
             const url =
